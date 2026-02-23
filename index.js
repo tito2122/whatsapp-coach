@@ -1,13 +1,15 @@
 const express = require('express');
 const app = express();
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 
 app.post('/webhook', (req, res) => {
-  const message = req.body.Body;
-  const from = req.body.From;
-  console.log('message from: ' + from);
-  res.type('text/xml');
-  res.send('<Response><Message>קיבלתי: ' + message + '</Message></Response>');
+  res.set('Content-Type', 'text/xml');
+  res.send('<Response><Message>שלום! קיבלתי את הודעתך 💪</Message></Response>');
+});
+
+app.get('/', (req, res) => {
+  res.send('ok');
 });
 
 const PORT = process.env.PORT || 3000;
