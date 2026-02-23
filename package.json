@@ -1,0 +1,21 @@
+{
+  "name": "whatsapp-coach",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tito2122/whatsapp-coach.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tito2122/whatsapp-coach/issues"
+  },
+  "homepage": "https://github.com/tito2122/whatsapp-coach#readme"
+}
