@@ -14,23 +14,27 @@ async function askClaude(message) {
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 500,
-      system: 'אתה מאמן כושר אישי בשם קואץ. אתה עונה בעברית בצורה קצרה, מעודדת ומקצועית. אתה עוזר למשתמש עם תוכניות אימון, תזונה ומוטיבציה.',
+      system: 'אתה מאמן כושר אישי בשם קואץ. אתה עונה בעברית בצורה קצרה ומקצועית.',
       messages: [{ role: 'user', content: message }]
     })
   });
   const data = await response.json();
-  return data.content[0].text;
+  console.log('Claude response:', JSON.stringify(data));
+  if (data.content && data.content[0]) {
+    return data.content[0].text;
+  }
+  console.log('Error:', JSON.stringify(data));
+  return 'לא הצלחתי לענות, נסה שוב';
 }
 
 app.post('/webhook', async (req, res) => {
   try {
     const message = req.body.Body || '';
     const reply = await askClaude(message);
-    const safeReply = reply.replace(/&/g, 'and').replace(/</g, '(').replace(/>/g, ')');
     res.set('Content-Type', 'text/xml');
-    res.send('<Response><Message>' + safeReply + '</Message></Response>');
+    res.send('<Response><Message>' + reply + '</Message></Response>');
   } catch (err) {
-    console.error(err);
+    console.error('Error:', err);
     res.set('Content-Type', 'text/xml');
     res.send('<Response><Message>שגיאה, נסה שוב</Message></Response>');
   }
