@@ -21,8 +21,7 @@ async function askGroq(userPhone, message) {
       'Authorization': 'Bearer ' + process.env.GROQ_API_KEY
     },
     body: JSON.stringify({
-      model: 'llama-3.1-8b-instant',
-      max_tokens: 500,
+      model: 'llama-3.3-70b-versatile',      max_tokens: 500,
       messages: [
         { role: 'system', content: 'אתה מאמן כושר אישי בשם רועי. אתה ישראלי, מדבר עברית תקנית וטבעית בלבד. אסור לך להשתמש במילים באנגלית. אתה מעודד, מקצועי וחברותי. אתה עוזר עם תוכניות אימון, תזונה נכונה ומוטיבציה. שאלות ראשונות תמיד: מה המטרה שלך? כמה פעמים בשבוע אתה מתאמן?' },
         ...conversations[userPhone]
