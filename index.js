@@ -3,14 +3,23 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.post('/webhook', (req, res) => {
-  res.set('Content-Type', 'text/xml');
-  res.send('<Response><Message>שלום! קיבלתי את הודעתך 💪</Message></Response>');
-});
+async function askClaude(message) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      system: 'אתה מאמן כושר אישי בשם "קואץ׳". אתה עונה בעברית בצורה קצרה, מעודדת ומקצועית. אתה עוזר למשתמש עם תוכניות אימון, תזונה ומוטיבציה.',
+      messages: [{ role: 'user', content: message }]
+    })
+  });
+  const data = await response.json();
+  return data.content[0].text;
+}
 
-app.get('/', (req, res) => {
-  res.send('ok');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('server running on port ' + PORT));
+app.post('/webhook', asyn
