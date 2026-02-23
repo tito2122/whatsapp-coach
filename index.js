@@ -3,35 +3,31 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-async function askClaude(message) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+async function askGroq(message) {
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01'
+      'Authorization': 'Bearer ' + process.env.GROQ_API_KEY
     },
     body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
+      model: 'llama-3.1-8b-instant',
       max_tokens: 500,
-      system: 'אתה מאמן כושר אישי בשם קואץ. אתה עונה בעברית בצורה קצרה ומקצועית.',
-      messages: [{ role: 'user', content: message }]
+      messages: [
+        { role: 'system', content: 'אתה מאמן כושר אישי בשם קואץ. אתה עונה בעברית בצורה קצרה, מעודדת ומקצועית. אתה עוזר למשתמש עם תוכניות אימון, תזונה ומוטיבציה.' },
+        { role: 'user', content: message }
+      ]
     })
   });
   const data = await response.json();
-  console.log('API KEY exists:', !!process.env.ANTHROPIC_API_KEY);
-console.log('Claude response:', JSON.stringify(data));
-  if (data.content && data.content[0]) {
-    return data.content[0].text;
-  }
-  console.log('Error:', JSON.stringify(data));
-  return 'לא הצלחתי לענות, נסה שוב';
+  console.log('Groq response:', JSON.stringify(data));
+  return data.choices[0].message.content;
 }
 
 app.post('/webhook', async (req, res) => {
   try {
     const message = req.body.Body || '';
-    const reply = await askClaude(message);
+    const reply = await askGroq(message);
     res.set('Content-Type', 'text/xml');
     res.send('<Response><Message>' + reply + '</Message></Response>');
   } catch (err) {
