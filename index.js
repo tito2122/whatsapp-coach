@@ -21,7 +21,3 @@ app.post('/webhook', (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`שרת רץ על פורט ${PORT}`));
 ```
-
-גם צור קובץ בשם `Procfile` (ללא סיומת) עם התוכן:
-```
-web: node index.js
