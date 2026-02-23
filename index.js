@@ -3,7 +3,17 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-async function askGroq(message) {
+const conversations = {};
+
+async function askGroq(userPhone, message) {
+  if (!conversations[userPhone]) {
+    conversations[userPhone] = [];
+  }
+  conversations[userPhone].push({ role: 'user', content: message });
+  if (conversations[userPhone].length > 10) {
+    conversations[userPhone] = conversations[userPhone].slice(-10);
+  }
+
   const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -14,20 +24,23 @@ async function askGroq(message) {
       model: 'llama-3.1-8b-instant',
       max_tokens: 500,
       messages: [
-        { role: 'system', content: 'אתה מאמן כושר אישי בשם קואץ. אתה עונה בעברית בצורה קצרה, מעודדת ומקצועית. אתה עוזר למשתמש עם תוכניות אימון, תזונה ומוטיבציה.' },
-        { role: 'user', content: message }
+        { role: 'system', content: 'אתה מאמן כושר אישי בשם רועי. אתה ישראלי, מדבר עברית תקנית וטבעית בלבד. אסור לך להשתמש במילים באנגלית. אתה מעודד, מקצועי וחברותי. אתה עוזר עם תוכניות אימון, תזונה נכונה ומוטיבציה. שאלות ראשונות תמיד: מה המטרה שלך? כמה פעמים בשבוע אתה מתאמן?' },
+        ...conversations[userPhone]
       ]
     })
   });
+
   const data = await response.json();
-  console.log('Groq response:', JSON.stringify(data));
-  return data.choices[0].message.content;
+  const reply = data.choices[0].message.content;
+  conversations[userPhone].push({ role: 'assistant', content: reply });
+  return reply;
 }
 
 app.post('/webhook', async (req, res) => {
   try {
     const message = req.body.Body || '';
-    const reply = await askGroq(message);
+    const userPhone = req.body.From || 'unknown';
+    const reply = await askGroq(userPhone, message);
     res.set('Content-Type', 'text/xml');
     res.send('<Response><Message>' + reply + '</Message></Response>');
   } catch (err) {
