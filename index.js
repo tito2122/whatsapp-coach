@@ -19,7 +19,8 @@ async function askClaude(message) {
     })
   });
   const data = await response.json();
-  console.log('Claude response:', JSON.stringify(data));
+  console.log('API KEY exists:', !!process.env.ANTHROPIC_API_KEY);
+console.log('Claude response:', JSON.stringify(data));
   if (data.content && data.content[0]) {
     return data.content[0].text;
   }
